@@ -19,6 +19,7 @@ public class UrlUtils {
         }
         List<String> list = Lists.newArrayList();
         for (String url : urls) {
+            url = url.substring(0,url.indexOf("?"));
             for (String urlTemp : url.split("/")) {
                 if (StringUtils.isBlank(urlTemp)) {
                     continue;

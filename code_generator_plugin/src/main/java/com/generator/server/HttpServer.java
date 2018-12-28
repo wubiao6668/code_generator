@@ -1,6 +1,6 @@
 package com.generator.server;
 
-import com.generator.AppBoot;
+import com.generator.context.Application;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -13,7 +13,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 
 /**
@@ -51,7 +50,7 @@ public class HttpServer {
     }
 
     protected ChannelInitializer<Channel> createInitializer(ChannelGroup group) {
-        return AppBoot.applicationContext.getBean(HttpServerInitializer.class);
+        return Application.context.getBean(HttpServerInitializer.class);
     }
 
     public void destroy() {

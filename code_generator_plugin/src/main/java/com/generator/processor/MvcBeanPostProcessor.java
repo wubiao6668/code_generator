@@ -2,6 +2,7 @@ package com.generator.processor;
 
 import com.generator.annotation.RequestMapping;
 import com.generator.annotation.RestController;
+import com.generator.context.Application;
 import com.generator.model.MvcInvokeMethod;
 import com.generator.util.UrlUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -13,15 +14,12 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wubiao
  */
 @Component
 public class MvcBeanPostProcessor implements BeanPostProcessor {
-
-    public static ConcurrentHashMap<String, MvcInvokeMethod> invokeMethodConcurrentHashMap = new ConcurrentHashMap<>();
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -48,13 +46,13 @@ public class MvcBeanPostProcessor implements BeanPostProcessor {
                 mvcInvokeMethod = new MvcInvokeMethod();
                 for (String methodRequestValue : methodRequestValues) {
                     String fullPath = UrlUtils.fullUrlPath(classRequestValue, methodRequestValue);
-                    MvcInvokeMethod mvcInvokeMethodExist = invokeMethodConcurrentHashMap.get(fullPath);
+                    MvcInvokeMethod mvcInvokeMethodExist = Application.webMethodMap.get(fullPath);
                     if (null != mvcInvokeMethodExist) {
                         throw new RuntimeException(fullPath + " is same to  " + mvcInvokeMethodExist.getBean().getClass() + " and " + bean.getClass());
                     }
                     mvcInvokeMethod.setMethod(method);
                     mvcInvokeMethod.setBean(bean);
-                    invokeMethodConcurrentHashMap.put(fullPath, mvcInvokeMethod);
+                    Application.webMethodMap.put(fullPath, mvcInvokeMethod);
                 }
             }
         }

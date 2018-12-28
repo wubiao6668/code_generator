@@ -1,6 +1,6 @@
 package com.generator.server;
 
-import com.generator.AppBoot;
+import com.generator.context.Application;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -22,7 +22,7 @@ public class HttpServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new ChunkedWriteHandler());
         pipeline.addLast(new HttpObjectAggregator(64 * 1024));
-        pipeline.addLast(AppBoot.applicationContext.getBean(HttpRequestHandler.class));
+        pipeline.addLast(Application.context.getBean(HttpRequestHandler.class));
     }
 
 

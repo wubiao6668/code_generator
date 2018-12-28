@@ -19,6 +19,7 @@
         <java.version>1.8</java.version>
         <jaction.xml.version>2.9.8</jaction.xml.version>
         <netty.version>4.1.32.Final</netty.version>
+        <jaction.xml.version>2.9.8</jaction.xml.version>
     </properties>
 
     <dependencyManagement>
