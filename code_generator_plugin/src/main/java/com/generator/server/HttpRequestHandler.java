@@ -14,12 +14,17 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.maven.wagon.util.IoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
@@ -36,11 +41,29 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         System.out.println(request);
         String url = request.uri();
+        if (UrlUtils.isStaticResource(url)) {
+            processStaticResource(ctx, request);
+            return;
+        }
         processMvc(ctx, request);
+        return;
     }
 
     public void processStaticResource(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-
+        String url = request.uri();
+        String fullFilePath = UrlUtils.fullFilePath(url);
+        URL staticUrl = this.getClass().getResource(fullFilePath);
+        File file = new File(staticUrl.toURI());
+        if (BooleanUtils.isFalse(file.exists())) {
+            FullHttpResponse fullHttpResponse = HttpResponseBuilder.builNotFound("404");
+            ctx.writeAndFlush(fullHttpResponse);
+            return;
+        }
+        String fileExtend = FilenameUtils.getExtension(file.getName());
+        String fileContent = IoUtils.toString(new FileInputStream(file), "utf-8");
+        String contentType = ContentTypeConstants.getContentTypeByFileExtend(fileExtend);
+        FullHttpResponse fullHttpResponse = HttpResponseBuilder.buildOk(fileContent,contentType);
+        ctx.writeAndFlush(fullHttpResponse);
     }
 
     public void processMvc(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {

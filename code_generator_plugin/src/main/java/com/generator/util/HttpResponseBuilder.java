@@ -12,6 +12,18 @@ import java.util.Map;
 public class HttpResponseBuilder {
 
 
+    public static FullHttpResponse buildText(Object _content) {
+        return createHttpResponse(HttpResponseStatus.OK, _content, ContentTypeConstants.TEXT_HTML);
+    }
+
+    public static FullHttpResponse builNotFound(Object _content) {
+        return createHttpResponse(HttpResponseStatus.NOT_FOUND, _content, ContentTypeConstants.TEXT_HTML);
+    }
+
+    public static FullHttpResponse buildText(HttpResponseStatus _status, Object _content) {
+        return createHttpResponse(HttpResponseStatus.OK, _content, ContentTypeConstants.TEXT_HTML);
+    }
+
     public static FullHttpResponse buildOk(Object _content) {
         return createHttpResponse(HttpResponseStatus.OK, _content, ContentTypeConstants.APPLICATION_JSON_UTF8);
     }

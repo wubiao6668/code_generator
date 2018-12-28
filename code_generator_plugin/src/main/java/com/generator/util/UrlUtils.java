@@ -53,7 +53,7 @@ public class UrlUtils {
 //
 //    }
 
-    public boolean isStaticResource(String url) {
+    public static boolean isStaticResource(String url) {
         if (StringUtils.isBlank(url)) {
             return false;
         }
