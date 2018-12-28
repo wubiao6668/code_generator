@@ -1,12 +1,6 @@
-
 package com.generator.util;
 
-
-/**
- * ReflectUtils
- */
-public final class ReflectUtils {
-
+public class Reflect2Utils {
     public static Object getDefaultValue(Class c) {
         if (c.isPrimitive()) {
             String t = c.getName();
@@ -46,5 +40,6 @@ public final class ReflectUtils {
         System.out.println(s);
         System.out.println(s2);
     }
+
 
 }
