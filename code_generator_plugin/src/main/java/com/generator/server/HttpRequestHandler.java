@@ -16,7 +16,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Method;
@@ -24,7 +23,6 @@ import java.lang.reflect.Parameter;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author wubiao
@@ -37,6 +35,15 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         System.out.println(request);
+        String url = request.uri();
+        processMvc(ctx, request);
+    }
+
+    public void processStaticResource(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+
+    }
+
+    public void processMvc(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         String url = request.uri();
         String contentType = request.headers().get("Content-Type");
         if (contentType.contains(";")) {
@@ -74,7 +81,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         //只有一个参数
         if (parameters.length == 1) {
             if (Reflect2Utils.isPrimitive(firstParameters.getType())) {
-                Object requestParamValue = Optional.ofNullable(requestParamMap).map(Map::values).map(vs->vs.stream().findFirst().orElse(null)).orElse(null);
+                Object requestParamValue = Optional.ofNullable(requestParamMap).map(Map::values).map(vs -> vs.stream().findFirst().orElse(null)).orElse(null);
                 if (null == requestParamValue) {
                     requestParamValue = Reflect2Utils.getDefaultValue(firstParameters.getType());
                 }
@@ -108,7 +115,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         FullHttpResponse fullHttpResponse = HttpResponseBuilder.buildOk(object);
         ctx.writeAndFlush(fullHttpResponse);
     }
-
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
