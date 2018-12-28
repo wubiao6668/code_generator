@@ -19,7 +19,10 @@ public class UrlUtils {
         }
         List<String> list = Lists.newArrayList();
         for (String url : urls) {
-            url = url.substring(0,url.indexOf("?"));
+            int questionIndex = url.indexOf("?");
+            if (questionIndex >= 0) {
+                url = url.substring(0, questionIndex);
+            }
             for (String urlTemp : url.split("/")) {
                 if (StringUtils.isBlank(urlTemp)) {
                     continue;
@@ -63,8 +66,8 @@ public class UrlUtils {
     public static void main(String[] args) {
 //        System.out.println(File.separator);
 //        System.out.println(File.pathSeparator);
-        String[] dd = {"aaa","bbb"};
-        String[] cc = {"cc","dd"};
+        String[] dd = {"aaa", "bbb"};
+        String[] cc = {"cc", "dd"};
 //        System.out.println(fullFilePath(dd,cc));
     }
 }

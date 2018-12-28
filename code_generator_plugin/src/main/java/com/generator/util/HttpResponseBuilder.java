@@ -79,7 +79,7 @@ public class HttpResponseBuilder {
         } else if (_content != null) {
             StringWriter strWriter = new StringWriter();
             try {
-                ObjectMapperUtil.jsonMapper.writeValue(strWriter, _content);
+                JsonUtil.jsonMapper.writeValue(strWriter, _content);
                 contentStr = strWriter.toString();
             } catch (Exception e) {
                 e.printStackTrace(new PrintWriter(strWriter));

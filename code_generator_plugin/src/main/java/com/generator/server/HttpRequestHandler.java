@@ -5,8 +5,9 @@ import com.generator.context.Application;
 import com.generator.model.MvcInvokeMethod;
 import com.generator.service.TestService;
 import com.generator.util.HttpResponseBuilder;
+import com.generator.util.JsonUtil;
+import com.generator.util.Reflect2Utils;
 import com.generator.util.UrlUtils;
-import com.google.common.collect.Lists;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * @author wubiao
@@ -32,9 +34,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         System.out.println(request);
         String url = request.uri();
-        //暂时不支持url取参数
-//        QueryStringDecoder queryStrdecoder = new QueryStringDecoder(url);
-//        Set<Map.Entry<String, List<String>>> entrySet = queryStrdecoder.parameters().entrySet();
         String contentType = request.headers().get("Content-Type");
         if (contentType.contains(";")) {
             contentType = contentType.split(";")[0];
@@ -46,8 +45,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
         String fullUrl = UrlUtils.fullUrlPath(url);
-        //参数json
-        String requestContent = request.content().toString(Charset.forName("UTF-8"));
         MvcInvokeMethod mvcInvokeMethod = Application.webMethodMap.get(fullUrl);
         if (null == mvcInvokeMethod) {
             FullHttpResponse fullHttpResponse = HttpResponseBuilder.createHttpResponse(HttpResponseStatus.METHOD_NOT_ALLOWED, "方法不存在");
@@ -65,16 +62,38 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
         int parametersLength = parameters.length;
-        Object[] requestParam = new Object[parametersLength];
+        Object[] invokeParam = new Object[parametersLength];
+        //参数
+        String requestContent = request.content().toString(Charset.forName("UTF-8"));
+        Map requestParamMap = JsonUtil.parseJson(requestContent, Map.class);
+        Parameter firstParameters = parameters[0];
+        //只有一个参数，且不是primitive类型
+        if (parameters.length == 1 && BooleanUtils.isFalse(Reflect2Utils.isPrimitive(firstParameters.getType()))) {
+            invokeParam[0] = JsonUtil.parseJson(requestContent, firstParameters.getType());
+            Object object = method.invoke(bean, invokeParam);
+            FullHttpResponse fullHttpResponse = HttpResponseBuilder.buildOk(object);
+            ctx.writeAndFlush(fullHttpResponse);
+            return;
+        }
+        //一个primitive类型或者多个参数
         for (int i = 0; i < parametersLength; i++) {
             Parameter parameter = parameters[i];
             Class<?> parameterClassType = parameter.getType();
-            boolean isPrimitive = parameterClassType.isPrimitive();
-
-            System.out.println(isPrimitive);
+            boolean isPrimitive = Reflect2Utils.isPrimitive(parameterClassType);
+            String name = parameter.getName();
+            Object requestParamValue = requestParamMap.get(name);
+            if (isPrimitive) {
+                if (null == requestParamValue) {
+                    requestParamValue = Reflect2Utils.getDefaultValue(parameterClassType);
+                }
+                invokeParam[i] = requestParamValue;
+                continue;
+            }
+            invokeParam[i] = JsonUtil.parseJson(JsonUtil.toJsonString(requestParamValue), parameterClassType);
         }
-        FullHttpResponse fullHttpResponse = HttpResponseBuilder.buildOk(Lists.newArrayList(1, 2, 3, 4, 5));
 
+        Object object = method.invoke(bean, invokeParam);
+        FullHttpResponse fullHttpResponse = HttpResponseBuilder.buildOk(object);
         ctx.writeAndFlush(fullHttpResponse);
     }
 
@@ -84,4 +103,5 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         cause.printStackTrace();
         ctx.close();
     }
+
 }
