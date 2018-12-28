@@ -1,5 +1,6 @@
 package com.generator.controller;
 
+import com.generator.annotation.Param;
 import com.generator.annotation.RequestMapping;
 import com.generator.annotation.RestController;
 import com.generator.model.TestModel;
@@ -26,7 +27,7 @@ public class TestController {
     }
 
     @RequestMapping(value = "/test3")
-    public List<Integer> list(TestModel testModel, String name, Integer age, int sex) {
+    public List<Integer> list(@Param("testModel") TestModel testModel, @Param("name") String name, Integer age, int sex) {
         return Lists.newArrayList(1, 2, 3, 4, 4, 5);
     }
 
