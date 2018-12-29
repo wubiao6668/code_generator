@@ -109,6 +109,13 @@ public class HttpResponseBuilder {
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, contentBuf.length);
         }
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
+//        String origin = request.getHeader("Origin");
+        response.headers().set("Access-Control-Allow-Origin", "*");
+        response.headers().set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.headers().set("Access-Control-Max-Age", "3600");
+        response.headers().set("Access-Control-Allow-Headers", "x-requested-with,Authorization");
+        response.headers().set("Access-Control-Allow-Credentials", "true");
+
 //		FullHttpRequest request = RequestContext.get(RequestContext.Key.ORIGINAL_REQUEST);
 //		if (HttpUtil.isKeepAlive(request)) {
 //			response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);

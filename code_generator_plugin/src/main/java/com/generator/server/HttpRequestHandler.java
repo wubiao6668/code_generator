@@ -70,10 +70,11 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     public void processMvc(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         String url = request.uri();
-        String contentType = request.headers().get("Content-Type");
+        String contentType = Optional.ofNullable(request.headers().get("Content-Type")).orElse(ContentTypeConstants.APPLICATION_JSON );
         if (contentType.contains(";")) {
             contentType = contentType.split(";")[0];
         }
+
         contentType = contentType.toLowerCase();
         if (BooleanUtils.isFalse(ContentTypeConstants.APPLICATION_JSON.equals(contentType))) {
             FullHttpResponse fullHttpResponse = HttpResponseBuilder.createHttpResponse(HttpResponseStatus.SERVICE_UNAVAILABLE, "服务器不支持请求");
