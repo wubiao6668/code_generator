@@ -41,10 +41,12 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         System.out.println(request);
         String url = request.uri();
+        //静态资源处理
         if (UrlUtils.isStaticResource(url)) {
             processStaticResource(ctx, request);
             return;
         }
+        //接口处理
         processMvc(ctx, request);
         return;
     }
