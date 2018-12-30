@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import Index from '@/components/Index'
 import router from './router'
 
 import 'vx-easyui/dist/themes/default/easyui.css';
@@ -21,6 +22,6 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
-  components: { App },
-  template: '<App/>'
+  components: { Index },
+  template: '<Index/>'
 })

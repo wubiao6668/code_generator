@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Constrain Draggable</h2>
+    <h2>Consle</h2>
     <!--<Panel :bodyStyle="{position: 'relative', width: '200px',height:'100%',border:'1px solid',padding:'2px'}">-->
     <!--<template v-for="(item,index) in items">-->
     <!--<div v-Draggable="{drag:onDrag,revert:false,dragEnd:onDragEnd,axis:axis}" :row="item" :id="index" :index="index"-->
