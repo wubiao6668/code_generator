@@ -1,201 +1,128 @@
 <template>
   <div>
     <h2>code generator</h2>
-    <Layout style="height:250px;max-width:600px">
-      <DataList style="height:100%"
-                :data="productData"
-                itemCls="dataitem">
-        <template slot-scope="{row}">
-
-          <div class="product" v-Draggable="{row:row,revert:true,proxy:$refs.proxy,dragStart:onDragStart}">
-            <p>{{row.name}}</p>
-            <p>{{row.listprice}}</p>
-          </div>
-        </template>
-      </DataList>
-      <LayoutPanel region="east" v-Droppable="dropOpts" style="width:30%;"
+    <Layout style="height:250px;max-width:100%">
+      <LayoutPanel region="west" style="width:50%;"
                    bodyCls="f-row"
-                   :bodyStyle="bodyStyle"
-                   @dragEnter="isover=true"
-                   @dragLeave="isover=false"
-                   @drop="isover=false;onDrop()">
-        <DataGrid class="f-full"
-                  :border="false"
-                  :showFooter="true"
-                  :data="cartData"
-                  :footerData="sumData">
-          <GridColumn :field="'name'" :title="'Name'"></GridColumn>
-          <GridColumn :field="'listprice'" :title="'Price'" align="right"></GridColumn>
-        </DataGrid>
+                   :bodyStyle="{}">
+
+        <TreeGrid style="height:250px"
+                  :data="data" v-on:rowCheck="onRowCheck" :checkbox="true" idField="id" treeField="name">
+          <GridColumn field="name" title="Name"></GridColumn>
+          <GridColumn field="size" title="Size"></GridColumn>
+          <GridColumn field="date" title="Date"></GridColumn>
+        </TreeGrid>
+
+      </LayoutPanel>
+      <LayoutPanel region="east" style="width:50%;"
+                   bodyCls="f-row"
+                   :bodyStyle="{}">
+
+        <TreeGrid style="height:250px"
+                  :data="data2" :checkbox="true" idField="id" treeField="name">
+          <GridColumn field="name" title="Name"></GridColumn>
+          <GridColumn field="size" title="Size"></GridColumn>
+          <GridColumn field="date" title="Date"></GridColumn>
+          <GridColumn title="opt">
+            <template slot="cell" slot-scope="{row}">
+              <LinkButton btnCls="c5" style="width:120px">Button5</LinkButton>
+            </template>
+          </GridColumn>
+        </TreeGrid>
       </LayoutPanel>
     </Layout>
-    <DraggableProxy ref="proxy">
-      <div v-if="dragItem" class="product product-proxy">
-        <img draggable="false" :src="'https://www.jeasyui.com/tutorial/datagrid/images/'+dragItem.itemid+'.png'">
-        <p>{{dragItem.name}}</p>
-        <p>{{dragItem.listprice}}</p>
-      </div>
-    </DraggableProxy>
+    <div>
+      <Tabs :tabPosition="position" style="height:250px">
+        <TabPanel :title="'生成set方法'">
+          <p>Tab Panel1 生成set方法</p>
+        </TabPanel>
+        <TabPanel :title="'生成JSON文档'">
+          <p>Tab Panel2</p>
+        </TabPanel>
+        <TabPanel :title="'生成wiki文档'">
+          <p>Tab Panel3</p>
+        </TabPanel>
+        <TabPanel :title="'Help'" :closable="true" iconCls="icon-help">
+          <p>This is the help content.</p>
+        </TabPanel>
+      </Tabs>
+    </div>
   </div>
 </template>
 
 <script>
   export default {
     data() {
+      let data = this.getData();
+      data.forEach((value, index) => value.index = index);
       return {
-        dropOpts: {
-          drop: this.onDrop
-        },
-        isover: false,
-        dragItem: null,
-        cartData: [],
-        sumData: [{ name: "Total", listprice: 0 }],
-        productData: [
-          {
-            code: "FI-SW-01",
-            name: "Koi",
-            unitcost: 10.0,
-            status: "P",
-            listprice: 36.5,
-            attr: "Large",
-            itemid: "EST-1"
-          },
-          {
-            code: "K9-DL-01",
-            name: "Dalmation",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 18.5,
-            attr: "Spotted Adult Female",
-            itemid: "EST-2"
-          },
-          {
-            code: "RP-SN-01",
-            name: "Rattlesnake",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 38.5,
-            attr: "Venomless",
-            itemid: "EST-3"
-          },
-          {
-            code: "RP-SN-01",
-            name: "Rattlesnake",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 26.5,
-            attr: "Rattleless",
-            itemid: "EST-4"
-          },
-          {
-            code: "RP-LI-02",
-            name: "Iguana",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 35.5,
-            attr: "Green Adult",
-            itemid: "EST-5"
-          },
-          {
-            code: "FL-DSH-01",
-            name: "Manx",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 158.5,
-            attr: "Tailless",
-            itemid: "EST-6"
-          },
-          {
-            code: "FL-DSH-01",
-            name: "Manx",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 83.5,
-            attr: "With tail",
-            itemid: "EST-7"
-          },
-          {
-            code: "FL-DLH-02",
-            name: "Persian",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 23.5,
-            attr: "Adult Female",
-            itemid: "EST-8"
-          },
-          {
-            code: "FL-DLH-02",
-            name: "Persian",
-            unitcost: 12.0,
-            status: "P",
-            listprice: 89.5,
-            attr: "Adult Male",
-            itemid: "EST-9"
-          },
-          {
-            code: "AV-CB-01",
-            name: "Amazon Parrot",
-            unitcost: 92.0,
-            status: "P",
-            listprice: 63.5,
-            attr: "Adult Male",
-            itemid: "EST-10"
-          }
-        ]
+        position:"right",
+        data: data,
+        data2: this.getData(),
       };
     },
-    computed: {
-      bodyStyle() {
-        return this.isover ? { border: "1px solid red" } : null;
-      }
-    },
     methods: {
-      onDragStart(state) {
-        this.dragItem = state.target.row;
+      onRowCheck(row) {
+
+        console.info(row)
+        let newRow = this.getData().find((value, index, arr) => {
+          console.info(value)
+          return index == row.index
+        })
+        console.info("newRow",newRow);
+        this.data2 = [...this.data2, newRow]
       },
-      onDrop() {
-        let index = this.productData.indexOf(this.dragItem);
-        if (index >= 0) {
-          this.productData = this.productData.filter((row, i) => i != index);
-          this.cartData = [...this.cartData, this.dragItem];
-          this.sumData = [
-            {
-              name: "Total",
-              listprice: this.sumData[0].listprice + this.dragItem.listprice
-            }
-          ];
+      deepCopy(obj, deep) {
+        // debugger
+        var o = obj instanceof Array ? [] : {};
+        for (var k in obj) {
+          var val = obj[k];
+          if (deep && typeof val === "object") {
+            o[k] = this.deepCopy(val, deep);
+          } else {
+            o[k] = val;
+          }
         }
+        return o;
+      },
+      getData() {
+        return [
+          {
+            id: 1,
+            name: "C",
+            size: "",
+            date: "02/19/2010"
+          },
+          {
+            id: 2,
+            name: "C",
+            size: "",
+            date: "02/19/2010"
+          },
+          {
+            id: 3,
+            name: "C",
+            size: "",
+            date: "02/19/2010"
+          },
+          {
+            id: 4,
+            name: "C",
+            size: "",
+            date: "02/19/2010",
+            children: [{
+              id: 8,
+              name: "Program Files",
+              size: "120 MB",
+              date: "03/20/2010"
+            }]
+          }
+        ];
       }
     }
   };
 </script>
 <style>
-  .dataitem {
-    width: 120px;
-    height: 130px;
-    float: left;
-    margin: 6px;
-  }
-  .product {
-    text-align: center;
-  }
-  .product img {
-    height: 80px;
-    padding: 10px;
-  }
-  .product p {
-    font-size: 12px;
-    margin: 5px 0;
-  }
-  .product-proxy {
-    width: 120px;
-    height: 130px;
-    background: #fbec88;
-    border: 1px solid #ccc;
-    opacity: 0.6;
-  }
-  .over {
-    border: 1px solid red;
-  }
+
 </style>
 ﻿
