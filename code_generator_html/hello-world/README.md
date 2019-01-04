@@ -1,4 +1,4 @@
-# code_generator_vue
+# hello-world
 
 ## Project setup
 ```
@@ -27,11 +27,3 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
-### Install plugin
-
-npm install  vue-highlightjs  --save
-npm install  highlight.js   --save
-npm install  vx-easyui --save
-npm install vue-resource --save
-
